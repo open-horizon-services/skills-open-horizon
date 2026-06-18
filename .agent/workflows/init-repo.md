@@ -92,48 +92,20 @@ This workflow sets up a complete repository foundation including:
 
 4. **Create .gitignore**
 
-   **Detect project type:**
-   - Check for `package.json` → Node.js
-   - Check for `requirements.txt`, `setup.py`, `pyproject.toml` → Python
-   - Check for `go.mod` → Go
-   - Check for `Cargo.toml` → Rust
-   - Check for `pom.xml`, `build.gradle` → Java
-   - Check for `.csproj` → C#
-   - Multiple types → Ask user which to prioritize
-
-   **Download appropriate .gitignore template:**
-   ```bash
-   # For Node.js
-   curl -sS https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore -o .gitignore
-   
-   # For Python
-   curl -sS https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore -o .gitignore
-   
-   # For Go
-   curl -sS https://raw.githubusercontent.com/github/gitignore/main/Go.gitignore -o .gitignore
+   Use the **Skill tool** to invoke `init-gitignore`:
+   ```
+   Invoke init-gitignore skill to set up repository .gitignore
    ```
 
-   **If .gitignore exists:**
-   - Ask if user wants to merge with standard template
-   - Preserve existing entries, add missing common patterns
+   This will:
+   - Check whether a `.gitignore` already exists at the repository root
+   - Scan the codebase to detect languages and frameworks
+   - Compose a tailored proposal from the `gitignore-snippets` skill (Global patterns + detected stacks)
+   - Diff against any existing `.gitignore`, preserving current entries
+   - Present the proposal and get explicit user approval before writing
+   - Write the file (or append additions if one already exists)
 
-   **Add common entries:**
-   ```
-   # Editor files
-   .vscode/
-   .idea/
-   *.swp
-   *.swo
-   *~
-   
-   # OS files
-   .DS_Store
-   Thumbs.db
-   
-   # Environment
-   .env
-   .env.local
-   ```
+   **Skip if:** `.gitignore` already exists and user declines to add anything during the skill's approval step
 
 5. **Create CONTRIBUTING.md (optional)**
 
@@ -268,7 +240,8 @@ Repository initialization complete.
 - Always check for existing files before creating
 - Never overwrite without explicit user confirmation
 - Preserve existing content when merging (e.g., .gitignore)
-- Use official sources for templates (GitHub, Contributor Covenant)
+- Use the init-gitignore skill for .gitignore (don't duplicate detection or template logic)
+- Use official sources for templates (Contributor Covenant)
 - Detect project type automatically when possible
 - Provide sensible defaults but allow customization
 - Show clear summary of what was done
@@ -291,17 +264,25 @@ Repository initialization complete.
 
 **Template Sources**
 
-- .gitignore: https://github.com/github/gitignore
+- .gitignore: `gitignore-snippets` skill (via `init-gitignore` skill)
 - Code of Conduct: https://www.contributor-covenant.org/
 - LICENSE: Official sources (Apache.org, GNU.org, etc.) via init-license skill
 
-**Integration with init-license Skill**
+**Integration with Skills**
 
-This workflow uses the `init-license` skill for LICENSE initialization. The skill handles:
-- Checking for existing licenses
-- Prompting for license type (Apache 2.0 or MIT recommended)
-- Downloading from official sources
-- Customizing with copyright information
-- Saving as LICENSE.md
+This workflow delegates specialist tasks to dedicated skills rather than duplicating their logic.
 
-The workflow focuses on orchestrating multiple initialization tasks, while delegating license-specific logic to the dedicated skill.
+**`init-license`** — handles LICENSE initialization:
+- Checks for existing licenses
+- Prompts for license type (Apache 2.0 or MIT recommended)
+- Downloads from official sources
+- Customises with copyright information
+- Saves as LICENSE.md
+
+**`init-gitignore`** — handles `.gitignore` creation and updates:
+- Detects languages and frameworks from the codebase
+- Composes tailored entries from the `gitignore-snippets` skill
+- Diffs against any existing `.gitignore` to avoid duplicates
+- Requires explicit user approval before writing anything
+
+The workflow focuses on orchestrating the full initialisation sequence; each skill owns its own file logic.
