@@ -21,13 +21,13 @@ This workflow sets up a complete repository foundation including:
 
    Check what already exists:
    ```bash
-   ls -la LICENSE* README* .gitignore CONTRIBUTING* CODE_OF_CONDUCT* 2>/dev/null
+   ls -la LICENSE* README* .gitignore CONTRIBUTING* CODE_OF_CONDUCT* MAINTAINER* Makefile 2>/dev/null
    ```
 
    Identify:
    - Which files are missing
    - Which files are empty or incomplete
-   - Repository type (detect from existing files/directories)
+   - Repository type (detect from existing files/directories, using **Skill tool** to invoke `init-gitignore` to detect and categorize)
 
 2. **Initialize LICENSE file**
 
@@ -86,7 +86,7 @@ This workflow sets up a complete repository foundation including:
 
    **Customization:**
    - Ask user for project name and description
-   - Detect project type (Python, Node.js, Go, etc.) from files
+   - Detect project type (Python, Node.js, Go, etc.) from files, using **Skill tool** to invoke `init-gitignore` to detect and categorize
    - Add language-specific installation/usage examples
    - Link to LICENSE.md with correct license type
 
@@ -107,7 +107,23 @@ This workflow sets up a complete repository foundation including:
 
    **Skip if:** `.gitignore` already exists and user declines to add anything during the skill's approval step
 
-5. **Create CONTRIBUTING.md (optional)**
+5. **Create or update MAINTAINERS.md**
+
+  Use the **Skill tool** to invoke `init-maintainers`:
+  ```
+  Invoke init-maintainers skill to set up MAINTAINERS.md
+  ```
+
+  This will:
+  - Check whether a `MAINTAINERS.md` already exists
+  - Prompt for each active maintainer's name, GitHub ID, and email address
+  - Optionally collect emeritus maintainer entries
+  - Write the file in the canonical Open Horizon table format
+  - Require at least one active maintainer before writing
+
+  **Skip if:** MAINTAINERS.md already exists and user declines to replace or append during the skill's confirmation step
+
+6. **Create CONTRIBUTING.md (optional)**
 
    Ask user: "Would you like to add a CONTRIBUTING.md file?"
 
@@ -151,34 +167,20 @@ This workflow sets up a complete repository foundation including:
      All commits must be signed off with `git commit -s` to indicate agreement with the DCO.
      ```
 
-6. **Create CODE_OF_CONDUCT.md (optional)**
+   - Reference the project contributing document as needed: https://raw.githubusercontent.com/open-horizon/.github/refs/heads/master/CONTRIBUTING.md
+
+7. **Create CODE_OF_CONDUCT.md (optional)**
 
    Ask user: "Would you like to add a Code of Conduct?"
 
    **If yes:**
-   - Recommend Contributor Covenant (industry standard)
-   - Download from official source:
+   - Recommend LF Projects Code of Conduct (standard for LF Edge projects)
+   - Download from official source and translate to Markdown format:
      ```bash
-     curl -sS https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md -o CODE_OF_CONDUCT.md
+     curl -sS https://lfprojects.org/policies/code-of-conduct/ -o CODE_OF_CONDUCT.md
      ```
+   - Format as Markdown
    - Customize contact information section
-
-7. **Initialize git repository (if needed)**
-
-   **If not a git repository:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Add LICENSE, README, and .gitignore"
-   ```
-
-   **If already a git repository:**
-   - Ask if user wants to commit the new files
-   - If yes:
-     ```bash
-     git add LICENSE.md README.md .gitignore CONTRIBUTING.md CODE_OF_CONDUCT.md
-     git commit -m "docs: Add repository documentation and license"
-     ```
 
 8. **Display summary**
 
@@ -198,6 +200,7 @@ This workflow sets up a complete repository foundation including:
 ✓ LICENSE.md (Apache License 2.0)
 ✓ README.md (with project structure)
 ✓ .gitignore (Python template)
+✓ MAINTAINERS.md (2 active maintainers)
 ✓ CONTRIBUTING.md
 ✓ CODE_OF_CONDUCT.md (Contributor Covenant v2.1)
 
@@ -284,5 +287,12 @@ This workflow delegates specialist tasks to dedicated skills rather than duplica
 - Composes tailored entries from the `gitignore-snippets` skill
 - Diffs against any existing `.gitignore` to avoid duplicates
 - Requires explicit user approval before writing anything
+
+**`init-maintainers`** — handles `MAINTAINERS.md` creation and updates:
+- Checks for an existing `MAINTAINERS.md` and offers replace/append/cancel
+- Collects each active maintainer's name, GitHub ID, and email interactively
+- Optionally collects emeritus maintainer entries
+- Writes the file in the canonical Open Horizon table format
+- Requires at least one active maintainer before writing
 
 The workflow focuses on orchestrating the full initialisation sequence; each skill owns its own file logic.
