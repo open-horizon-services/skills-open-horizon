@@ -91,28 +91,40 @@ Initialize a repository with a software license file.
 
 5. **Process the license template**
 
-   Some licenses require customization:
+   All licenses require copyright customization. Before saving, collect:
+   - **Year**: Use current year from `date +%Y`
+   - **Name**: Try `git config user.name` first; if empty or unavailable, **ask the user** for the copyright holder name
 
-   **Apache, MIT, ISC** - Replace placeholders:
+   Use the **AskUserQuestion tool** to prompt for the copyright holder name if it cannot be determined from git config.
+
+   **Apache 2.0** placeholders (in the boilerplate appendix at the bottom of the file):
+   - `[yyyy]` → Current year
+   - `[name of copyright owner]` → Copyright holder name
+
+   **MIT, ISC** placeholders:
    - `[year]` → Current year
-   - `[fullname]` → Get from git config or ask user
-   
+   - `[fullname]` → Copyright holder name
+
    ```bash
    YEAR=$(date +%Y)
    NAME=$(git config user.name 2>/dev/null || echo "")
-   
+
    if [ -z "$NAME" ]; then
-     # Ask user for copyright holder name
-     echo "Enter copyright holder name:"
+     # Ask user for copyright holder name via AskUserQuestion tool
+     # Then assign the response to NAME
+     NAME="<user-provided value>"
    fi
-   
-   # Replace placeholders (macOS compatible)
+
+   # Apache 2.0 placeholders (macOS compatible)
+   sed -i.bak "s/\[yyyy\]/$YEAR/g" LICENSE.md
+   sed -i.bak "s/\[name of copyright owner\]/$NAME/g" LICENSE.md
+
+   # MIT / ISC placeholders
    sed -i.bak "s/\[year\]/$YEAR/g" LICENSE.md
    sed -i.bak "s/\[fullname\]/$NAME/g" LICENSE.md
+
    rm LICENSE.md.bak
    ```
-
-   **Apache 2.0** - No customization needed, use as-is
 
 6. **Save as LICENSE.md**
 
