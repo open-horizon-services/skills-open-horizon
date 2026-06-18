@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires curl or wget for downloading license files.
 metadata:
   author: skills-open-horizon
-  version: "1.0"
+  version: "1.1"
 ---
 
 Initialize a repository with a software license file.
@@ -33,12 +33,29 @@ Initialize a repository with a software license file.
 
    **If LICENSE file exists and is not empty:**
    - Read the first few lines to identify the license type
-   - Display: "Repository already has a license: [detected type]"
-   - Ask if user wants to replace it
-   - If no, stop here
+   - Display the current license type and filename
+   - Present the following menu using `ask_followup_question`:
+
+     ```
+     ## License Already Present
+
+     Current license : [detected type]
+     File            : [filename]
+
+     Options:
+       a) Replace with a new license (current file backed up as LICENSE.bak)
+       b) Keep existing license — no changes
+       c) Cancel
+
+     Choose an option:
+     ```
+
+   - If the user chooses **(b) Keep** or **(c) Cancel**, stop here. Do not modify any files.
+   - If the user chooses **(a) Replace**, proceed to license selection (Step 3), then back up the
+     existing file before writing (Step 6).
 
    **If LICENSE file is missing or empty:**
-   - Proceed to license selection
+   - Proceed to license selection (Step 3).
 
 3. **Prompt user for license type**
 
@@ -130,15 +147,18 @@ Initialize a repository with a software license file.
 
    Write the processed license text to `LICENSE.md` in the repository root.
 
-   **If an old LICENSE file exists:**
-   - Warn and delete it
-   - Create the new `LICENSE.md`
+   **If an old LICENSE file exists (i.e., the user chose "Replace" in Step 2):**
+   - Back it up first, then remove the original:
 
    ```bash
-   if [ -f LICENSE ]; then
-     rm LICENSE
-   fi
+   # Back up the existing file (e.g., LICENSE → LICENSE.bak, LICENSE.md → LICENSE.md.bak)
+   EXISTING=$(find . -maxdepth 1 -iname "LICENSE*" -type f | head -1)
+   cp "$EXISTING" "${EXISTING}.bak"
+   rm "$EXISTING"
    ```
+
+   - Inform the user: "Existing license backed up as `${EXISTING}.bak`."
+   - Then write the new `LICENSE.md`.
 
 7. **Display confirmation**
 
@@ -184,24 +204,41 @@ It's one of the most popular open source licenses.
 Please review LICENSE.md to ensure it meets your needs.
 ```
 
-**Output When License Already Exists**
+**Output When License Already Exists (keep/cancel)**
 
 ```
 ## License Already Present
 
-**Current License:** Apache License 2.0
-**File:** LICENSE
+Current license : Apache License 2.0
+File            : LICENSE
 
-Repository already has a license. No action taken.
+No changes made. Existing license preserved.
+```
 
-To replace it, delete the existing LICENSE file and run this skill again.
+**Output When License Already Exists (replaced)**
+
+```
+## License Replaced
+
+Previous license : Apache License 2.0 (backed up as LICENSE.bak)
+New license      : MIT License
+File             : LICENSE.md
+Copyright        : 2026 Jane Doe
+Source           : https://opensource.org/licenses/MIT
+
+✓ License replaced successfully
+
+Please review LICENSE.md to ensure it meets your needs.
+You may delete LICENSE.bak once you have confirmed the new license is correct.
 ```
 
 **Guardrails**
 
 - Always check for existing LICENSE files before proceeding
-- Never overwrite an existing license without explicit user confirmation
-- Preserve old license as backup when replacing
+- Never overwrite an existing license without explicit user confirmation — always present the replace / keep / cancel menu first
+- When replacing, **always back up the old file** as `<original-name>.bak` before deleting it
+- Tell the user the backup location and remind them to delete it once satisfied
+- Do **not** instruct the user to manually delete the existing file in order to proceed — the skill handles replacement internally
 - Validate downloaded content before saving (check for HTTP errors, empty files)
 - For licenses requiring customization (MIT, BSD, ISC), always get copyright holder info
 - Default to LICENSE.md format for consistency
