@@ -45,11 +45,15 @@ This will give you the ability to create an obsidian-vault for managing memories
 
 ## Initialize the repository
 
-Ask your AI-assisted editor to initialize the repository.  If that's too ambiguous, reference the `@init-repo.md` workflow file and instruct the tool to read the contents and follow the guidance.
+Ask your ML-assisted IDE to `init repo`.  It will then go through all the skills listed below.  If that doesn't work, reference the `@init-repo.md` workflow file and instruct the tool to read the contents and follow the guidance.  If you do not want to run all of the skills at one go, manually run each skill that you do want to execute.
 
 ### LICENSE.md
 
+Ask your ML-assisted IDE to `init license`.  It will create a license file if one does not exist, populate the contents with a preferred license of your choice if the file is empty, and it will fill in license placeholders if they are not populated.
+
 ### .gitignore
+
+Ask your ML-assisted IDE to `init gitignore`.  It will scan the codebase and propose to populate the `.gitignore` file with sane defaults per best practices.
 
 ### README.md
 
@@ -57,7 +61,11 @@ Use the `init-readme` skill to create a new README.md with standard Open Horizon
 
 ### MAINTAINERS.md
 
+Ask your ML-assisted IDE to `init maintainers`.  It will extract your name, github ID, and email address from git defaults and populate the structure.  It will give you the option of adding more maintainers, and adding an emeritus section.  
+
 ### Makefile stub
+
+Ask your ML-assisted IDE to `init makefile`. It will stub out the makefile based on the current repository information and create default targets.  Test each target to confirm correct functionality. 
 
 ### Optionals
 
