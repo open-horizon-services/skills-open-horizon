@@ -10,9 +10,10 @@ AI-assisted skills for bootstrapping and managing [Open Horizon](https://lfedge.
 
 - [Install](#install-skills-into-your-project)
 - [Prerequisites](#prerequisites)
-- [Skills](#skills)
+- [Repository management Skills](#skills)
 - [Initialize a Repository](#initialize-the-repository)
 - [Contributing](#contributing)
+- [Open Horizon admin Skills](#oh--skillmd-files)
 - [License](#license)
 
 ## Install skills into your project
@@ -122,6 +123,49 @@ Review what was created.  When you're satisfied with the results, begin developm
 Contributions are welcome. Open an issue at [github.com/open-horizon-services/skills-open-horizon](https://github.com/open-horizon-services/skills-open-horizon).
 
 New skills should follow the existing conventions: a directory under `.agent/skills/{skill-name}/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`), step-by-step instructions, guardrails, and example output. Workflows live in `.agent/workflows/*.md`.
+
+## oh-* SKILL.md files
+
+Open Horizon-specific administration and management skills should use the `oh-` prefix in their skill directory name (for example: `.agent/skills/oh-init-service/SKILL.md`). This naming convention makes it easy to discover and filter Open Horizon skills in tooling and menus.
+
+Location
+
+- Place Open Horizon skills at: `.agent/skills/oh-<skill-name>/SKILL.md`
+
+Required frontmatter
+
+Include YAML frontmatter at the top of the SKILL.md with at least the following fields:
+
+- `name`: human-readable skill identifier (string)
+- `description`: short summary of what the skill does (string)
+- `tags`: (optional) array of tags; include `oh` or `open-horizon` to aid discovery
+
+Example frontmatter
+
+```yaml
+---
+name: oh-init-service
+description: "Initialize an Open Horizon service repository with standard files and metadata"
+tags:
+  - oh
+  - open-horizon
+---
+```
+
+Content guidelines
+
+- Provide clear, step-by-step instructions the ML-assisted IDE or human operators can follow.
+- Include example commands and expected outputs so users can validate the skill's behavior.
+- Add guardrails that state what the skill will not modify or any assumptions it makes.
+- Reference related workflow files in `.agent/workflows/` when appropriate.
+- Keep examples idempotent and safe to run in local development environments.
+
+Discovery and usage
+
+- Installer and discovery tooling look for the `oh-` prefix to present Open Horizon skills separately from general skills. Follow the naming convention to ensure your skill appears in Open Horizon-specific filters and menus.
+- Avoid committing secrets or environment-specific configuration in SKILL.md files; keep them generic and instructional.
+
+If adding a new Open Horizon skill, follow these conventions and consider opening a short PR that documents the skill's purpose and usage so others can discover and reuse it.
 
 ## License
 
