@@ -9,6 +9,32 @@ description: Expert guidance for administering the Open Horizon Exchange hub. Us
 
 Enable administrators to effectively manage Exchange resources, users, and organizations. Provide clear workflows for common administrative tasks while respecting authorization boundaries and security best practices.
 
+## Security Guidelines
+
+**CRITICAL: Credential Protection**
+
+When administering the Open Horizon Exchange, especially when working with `HZN_EXCHANGE_USER_AUTH`:
+- **NEVER** print or display the actual value of `HZN_EXCHANGE_USER_AUTH` to the screen
+- **ALWAYS** mask credential values when displaying commands or output
+- Use `${HZN_EXCHANGE_USER_AUTH}` or variable references in examples and documentation
+- When showing command output that includes credentials, replace with `***MASKED***` or similar
+- This applies to all user management, API calls, and administrative operations
+- When generating API keys, mask the returned key value in output
+
+Example of proper credential handling:
+```bash
+# CORRECT - uses variable reference
+hzn exchange user list -o myorg -u admin:${HZN_EXCHANGE_USER_AUTH}
+
+# CORRECT - masked in output
+HZN_EXCHANGE_USER_AUTH=***MASKED***
+curl -sS -u "myorg/admin:***MASKED***" ${HZN_EXCHANGE_URL}/orgs/myorg/users
+
+# INCORRECT - never do this
+hzn exchange user list -o myorg -u admin:actualpassword123
+curl -sS -u "myorg/admin:actualpassword123" ${HZN_EXCHANGE_URL}/orgs/myorg/users
+```
+
 ## Core Rules
 
 ### 1. Exchange User Management
