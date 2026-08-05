@@ -9,6 +9,29 @@ description: Expert guidance for troubleshooting Open Horizon edge deployments. 
 
 Enable developers to efficiently diagnose and resolve issues in distributed edge systems. Provide systematic debugging workflows that reduce time to resolution for common problems including connectivity failures, deployment issues, and service runtime errors.
 
+## Security Guidelines
+
+**CRITICAL: Credential Protection**
+
+When debugging Open Horizon systems, especially when working with `HZN_EXCHANGE_USER_AUTH`:
+- **NEVER** print or display the actual value of `HZN_EXCHANGE_USER_AUTH` to the screen
+- **ALWAYS** mask credential values when displaying commands or output
+- Use `${HZN_EXCHANGE_USER_AUTH}` in examples and documentation
+- When showing command output that includes credentials, replace with `***MASKED***` or similar
+- When exporting logs or diagnostic bundles, sanitize credentials before sharing
+
+Example of proper credential handling:
+```bash
+# CORRECT - uses variable reference
+curl -u "${HZN_ORG_ID}/${HZN_EXCHANGE_USER_AUTH}" ${HZN_EXCHANGE_URL}/orgs/${HZN_ORG_ID}/users
+
+# CORRECT - masked in output
+HZN_EXCHANGE_USER_AUTH=***MASKED***
+
+# INCORRECT - never do this
+HZN_EXCHANGE_USER_AUTH=admin:actualpassword123
+```
+
 ## Core Rules
 
 ### 1. Diagnose Agent Connectivity Issues

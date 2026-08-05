@@ -7,3 +7,26 @@ Read from those folders and create new files following a similar pattern in thos
 
 If you find a skill or workflow anywhere else, recommend moving it to the correct location, using the right naming conventions, and formatting the contents appropriately.
 
+## Security Guidelines
+
+**CRITICAL: Credential Protection**
+
+When working with Open Horizon credentials, especially `HZN_EXCHANGE_USER_AUTH`:
+- **NEVER** print or display the actual value of `HZN_EXCHANGE_USER_AUTH` to the screen
+- **ALWAYS** mask credential values when displaying commands or output
+- Use `${HZN_EXCHANGE_USER_AUTH}` in examples and documentation
+- When showing command output that includes credentials, replace with `***MASKED***` or similar
+- This applies to all skills, workflows, and documentation
+
+Example of proper credential handling:
+```bash
+# CORRECT - uses variable reference
+hzn exchange user list -u "${HZN_EXCHANGE_USER_AUTH}"
+
+# CORRECT - masked in output
+HZN_EXCHANGE_USER_AUTH=***MASKED***
+
+# INCORRECT - never do this
+HZN_EXCHANGE_USER_AUTH=admin:actualpassword123
+```
+

@@ -183,7 +183,73 @@ hzn unregister -f
 hzn unregister -frD
 ```
 
-### 5. Post-Installation Operations
+### 5. Registering Without a Workload
+
+Sometimes you need to register an agent without deploying any services or workloads. This is useful for:
+- Testing agent connectivity and configuration
+- Preparing nodes before assigning workloads
+- Troubleshooting registration issues
+- Setting up nodes that will receive policies later
+
+**Check if Node Already Exists in Exchange**
+
+Before registering, check if the node already exists:
+```bash
+hzn exchange node list -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}" | jq -r 'keys[]' | grep -F "<node-id>"
+```
+
+**Remove Existing Node (if needed)**
+
+If the node exists and has a public key set, you must remove it first:
+```bash
+# Remove with confirmation prompt
+hzn exchange node remove -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}" <node-id>
+
+# Remove without prompt (automated)
+echo "y" | hzn exchange node remove -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}" <node-id>
+```
+
+**Register Without Pattern or Policy**
+
+To register the agent without deploying any workload, simply omit the pattern and policy parameters:
+```bash
+hzn register -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}"
+```
+
+This command:
+- Creates the node in the Exchange with a random token
+- Sets the node state to "configured"
+- Does NOT deploy any services or workloads
+- Leaves the pattern field empty
+- Uses any existing node policy (if present) but won't form agreements without matching deployment policies
+
+**Verify Registration Without Workload**
+```bash
+# Check node status
+hzn node list
+
+# Expected output shows:
+# - organization: set to your org
+# - pattern: "" (empty)
+# - configstate.state: "configured"
+# - token_valid: true
+```
+
+**Common Issue: Public Key Conflict**
+
+If you see an error like "public key is set for node, cannot set a token":
+1. The node exists in the Exchange with a public key
+2. You must remove the node first: `echo "y" | hzn exchange node remove -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}" <node-id>`
+3. Then register again
+
+**Adding Workload Later**
+
+After registering without a workload, you can add one later by:
+- Registering with a pattern: `hzn register -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}" -p <pattern>`
+- Setting a node policy: `hzn policy update -f node.policy.json`
+- Or unregistering and re-registering with the desired configuration
+
+### 6. Post-Installation Operations
 
 **Monitor Agreement Formation**
 ```bash
@@ -217,7 +283,7 @@ You may want to:
 - List repositories in the "open-horizon-services" GitHub organization (names beginning with "service-")
 - Offer to clone and publish services to the Exchange
 
-### 6. Agent Lifecycle Operations
+### 7. Agent Lifecycle Operations
 
 **Check Agent Status**
 ```bash
@@ -246,7 +312,7 @@ sudo journalctl -u horizon -n 100
 hzn version
 ```
 
-### 7. Troubleshooting Agent Issues
+### 8. Troubleshooting Agent Issues
 
 **Issue: "must be root to run agent-install.sh"**
 - **Solution**: Use `sudo -E` to run the script with root privileges while preserving environment variables.
@@ -283,6 +349,14 @@ hzn version
 - Check organization exists: `hzn exchange org list`
 - Ensure node ID is unique in organization
 - Verify network connectivity to Exchange
+
+**Issue: "public key is set for node, cannot set a token"**
+- **Cause**: The node already exists in the Exchange with a public key configured, preventing token-based authentication.
+- **Solution**: Remove the existing node from the Exchange first:
+  ```bash
+  echo "y" | hzn exchange node remove -o "${HZN_ORG_ID}" -u "${HZN_EXCHANGE_USER_AUTH}" <node-id>
+  ```
+  Then register again.
 
 ## Notes
 

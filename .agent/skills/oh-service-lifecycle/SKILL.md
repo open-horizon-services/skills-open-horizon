@@ -9,6 +9,30 @@ description: Expert guidance for creating, building, testing, publishing, and ma
 
 Enable developers to efficiently develop and publish edge services with proper versioning, dependencies, and deployment configurations. Reduce errors in service definitions and provide clear workflows for the complete service lifecycle from creation to deprecation.
 
+## Security Guidelines
+
+**CRITICAL: Credential Protection**
+
+When managing Open Horizon service lifecycle, especially when working with `HZN_EXCHANGE_USER_AUTH`:
+- **NEVER** print or display the actual value of `HZN_EXCHANGE_USER_AUTH` to the screen
+- **ALWAYS** mask credential values when displaying commands or output
+- Use `${HZN_EXCHANGE_USER_AUTH}` in examples and documentation
+- When showing command output that includes credentials, replace with `***MASKED***` or similar
+- This applies to service publishing, registry credentials, and all Exchange operations
+- When using private registry credentials with `-r` flag, mask the password portion
+
+Example of proper credential handling:
+```bash
+# CORRECT - uses variable reference
+hzn exchange service publish -f service.definition.json
+
+# CORRECT - masked registry credentials
+hzn exchange service publish -f service.definition.json -r "registry.example.com:myuser:***MASKED***"
+
+# INCORRECT - never do this
+hzn exchange service publish -f service.definition.json -r "registry.example.com:myuser:actualpassword123"
+```
+
 ## Core Rules
 
 ### 1. Service Definition Creation

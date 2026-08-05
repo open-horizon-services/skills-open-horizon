@@ -9,6 +9,29 @@ description: Expert guidance for managing Open Horizon service deployments throu
 
 Enable developers to effectively deploy and manage edge services across distributed nodes using policy-based or pattern-based approaches. Reduce deployment failures through proper constraint configuration and provide clear troubleshooting workflows for agreement formation issues.
 
+## Security Guidelines
+
+**CRITICAL: Credential Protection**
+
+When managing Open Horizon deployments, especially when working with `HZN_EXCHANGE_USER_AUTH`:
+- **NEVER** print or display the actual value of `HZN_EXCHANGE_USER_AUTH` to the screen
+- **ALWAYS** mask credential values when displaying commands or output
+- Use `${HZN_EXCHANGE_USER_AUTH}` in examples and documentation
+- When showing command output that includes credentials, replace with `***MASKED***` or similar
+- This applies to all deployment policies, patterns, and registration commands
+
+Example of proper credential handling:
+```bash
+# CORRECT - uses variable reference
+hzn register -o myorg -u myorg/${HZN_EXCHANGE_USER_AUTH} -p warehouse-pattern
+
+# CORRECT - masked in output
+HZN_EXCHANGE_USER_AUTH=***MASKED***
+
+# INCORRECT - never do this
+hzn register -o myorg -u myorg/admin:actualpassword123 -p warehouse-pattern
+```
+
 ## Core Rules
 
 ### 1. Deployment Policy Creation
