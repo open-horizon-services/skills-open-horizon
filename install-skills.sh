@@ -17,5 +17,6 @@ git clone --depth 1 "$REPO_URL" "$TMP_DIR"
 
 echo "Copying .agent contents..."
 cp -r "$TMP_DIR/.agent/." ./.agent/
+cp -r "$TMP_DIR/.bob/." ./.bob/
 
 echo "Done. .agent contents have been installed into $(pwd)/.agent"
