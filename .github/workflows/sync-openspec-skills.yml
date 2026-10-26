@@ -1,0 +1,55 @@
+name: Sync OpenSpec skills
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-openspec-skills
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Fetch upstream OpenSpec skills
+        id: upstream
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse --branch main \
+            https://github.com/Fission-AI/OpenSpec.git "$RUNNER_TEMP/openspec"
+          git -C "$RUNNER_TEMP/openspec" sparse-checkout set skills
+          echo "commit=$(git -C "$RUNNER_TEMP/openspec" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Synchronize managed skills
+        env:
+          UPSTREAM_COMMIT: ${{ steps.upstream.outputs.commit }}
+        run: |
+          python3 scripts/sync-openspec-skills.py \
+            --upstream-skills "$RUNNER_TEMP/openspec/skills" \
+            --commit "$UPSTREAM_COMMIT" \
+            --report "$RUNNER_TEMP/openspec-sync-report.md"
+          cat "$RUNNER_TEMP/openspec-sync-report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create or update synchronization pull request
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: ${{ github.event.repository.default_branch }}
+          branch: automation/sync-openspec-skills
+          delete-branch: true
+          title: "chore: sync OpenSpec skills"
+          commit-message: "chore: sync OpenSpec skills from upstream"
+          body-path: ${{ runner.temp }}/openspec-sync-report.md
+          add-paths: |
+            .agents/skills/
+            .github/openspec-skills-manifest.txt

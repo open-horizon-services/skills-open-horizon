@@ -18,13 +18,13 @@ AI-assisted skills for bootstrapping and managing [Open Horizon](https://lfedge.
 
 ## Install skills into your project
 
-Run this one-liner from the root of your target repository to download and execute the installer script. It clones this repository into a temporary directory, copies the `.agent` folder into your project, then removes the temporary directory.
+Run this one-liner from the root of your target repository to download and execute the installer script. It clones this repository into a temporary directory, installs the canonical `.agents` folder and Bob commands, creates shared-skill links for Bob and Claude Code, then removes the temporary directory.
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/open-horizon-services/skills-open-horizon/main/install-skills.sh)
 ```
 
-> **Tip:** The script creates `.agent/` in your current working directory, so run it from your repository root.
+> **Tip:** The script creates `.agents/` and the `.bob/skills` and `.claude/skills` links in your current working directory, so run it from your repository root. Existing skill files are preserved; conflicting files cause the installer to stop and report the affected path.
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ openspec init
 
 Install the Obsidian desktop app and activate the CLI, then run the `init-obsidian` skill to set up an Obsidian vault for managing memories and keeping your context clean.
 
-For full instructions refer to [`.agent/skills/init-obsidian/SKILL.md`](.agent/skills/init-obsidian/SKILL.md).
+For full instructions refer to [`.agents/skills/init-obsidian/SKILL.md`](.agents/skills/init-obsidian/SKILL.md).
 
 ## Skills
 
@@ -122,15 +122,15 @@ Review what was created.  When you're satisfied with the results, begin developm
 
 Contributions are welcome. Open an issue at [github.com/open-horizon-services/skills-open-horizon](https://github.com/open-horizon-services/skills-open-horizon).
 
-New skills should follow the existing conventions: a directory under `.agent/skills/{skill-name}/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`), step-by-step instructions, guardrails, and example output. Workflows live in `.agent/workflows/*.md`.
+New skills should follow the existing conventions: a directory under `.agents/skills/{skill-name}/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`), step-by-step instructions, guardrails, and example output. `.agents/skills` is the canonical skill source; `.bob/skills` and `.claude/skills` link to it. Workflows live in `.agents/workflows/*.md`.
 
 ## oh-* SKILL.md files
 
-Open Horizon-specific administration and management skills should use the `oh-` prefix in their skill directory name (for example: `.agent/skills/oh-init-service/SKILL.md`). This naming convention makes it easy to discover and filter Open Horizon skills in tooling and menus.
+Open Horizon-specific administration and management skills should use the `oh-` prefix in their skill directory name (for example: `.agents/skills/oh-init-service/SKILL.md`). This naming convention makes it easy to discover and filter Open Horizon skills in tooling and menus.
 
 Location
 
-- Place Open Horizon skills at: `.agent/skills/oh-<skill-name>/SKILL.md`
+- Place Open Horizon skills at: `.agents/skills/oh-<skill-name>/SKILL.md`
 
 Required frontmatter
 
@@ -157,7 +157,7 @@ Content guidelines
 - Provide clear, step-by-step instructions the ML-assisted IDE or human operators can follow.
 - Include example commands and expected outputs so users can validate the skill's behavior.
 - Add guardrails that state what the skill will not modify or any assumptions it makes.
-- Reference related workflow files in `.agent/workflows/` when appropriate.
+- Reference related workflow files in `.agents/workflows/` when appropriate.
 - Keep examples idempotent and safe to run in local development environments.
 
 Discovery and usage
